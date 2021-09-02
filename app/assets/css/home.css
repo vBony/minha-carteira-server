@@ -1,0 +1,9 @@
+@font-face {
+    font-family: Gordita;
+    src: url(../fonts/gordita.woff);
+}
+
+* {
+    font-family: Gordita, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif in !important;
+    color: #31343b;
+}

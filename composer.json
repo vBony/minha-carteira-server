@@ -1,0 +1,13 @@
+{
+    "name": "conta/quero-emprego-web",
+    "type": "library",
+    "authors": [
+        {
+            "name": "VInicius Ferreira",
+            "email": "contato.vinicius-af@outlook.com"
+        }
+    ],
+    "require": {
+        "symfony/dotenv": "^5.3"
+    }
+}
