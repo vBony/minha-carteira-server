@@ -1,4 +1,5 @@
 <?php
+
 class userController extends controllerHelper{
     public function profile($id){
         $data = array();
@@ -7,17 +8,17 @@ class userController extends controllerHelper{
         $this->loadTemplate('user-profile', $data);
     }
 
-    public function register(){
+    public function criarConta(){
         $data = array();
-        $data['css'] = 'user-register.css';
-        $data['js'] = 'user-register.js';
+        $data['base_url'] = $_ENV['BASE_URL'];
 
-        $this->loadView('user-register', $data);
+        $this->loadView('cadastro', $data);
     }
 
-    public function login(){
-        $data = array();
-
-        $this->loadView('user-login', $data);
+    public function register(){
+        $Usuario = new Usuario();
+        $data = $_POST;
+        
+        $this->sendJson($data);
     }
 }
