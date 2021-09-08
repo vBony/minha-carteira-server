@@ -22,6 +22,12 @@ class controllerHelper{
     public function sendJson($data){
         echo json_encode($data);
     }
+
+    public function privatePage(){
+        if(!isset($_SESSION['logged']) && $_SESSION['logged'] != true){
+            header("Location: {$_ENV['BASE_URL']}login");
+        }
+    }
 }
 
 ?>
