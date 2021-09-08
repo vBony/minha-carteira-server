@@ -3,6 +3,7 @@
 class Usuario extends modelHelper{
     private $tabela = "usuario";
     public $errors;
+    public $defaultMessage = "Campo obrigatório";
 
 
     public function cadastrar($params){
@@ -30,31 +31,77 @@ class Usuario extends modelHelper{
         $sql->execute();
 
         if($sql->rowCount() > 0){
-            return $sql->fetch();
+            return $sql->fetch(PDO::FETCH_ASSOC);
         }
     }
 
+    public function login($params){
+        if(isset($params['usu_email'])){
+            if(!filter_var($params['usu_email'], FILTER_VALIDATE_EMAIL)){
+                $this->errors['usu_email'] = "E-mail inválido";
+            }   
+
+            if(empty($params['usu_email'])){
+                $this->errors['usu_email'] = $this->defaultMessage;
+            }
+        }else{
+            $this->errors['usu_email'] = $this->defaultMessage;
+        }
+
+        if(isset($params['usu_senha'])){
+            if(empty($params['usu_senha'])){
+                $this->errors['usu_senha'] = $this->defaultMessage;
+            }
+        }else{
+            $this->errors['usu_senha'] = $this->defaultMessage;
+        }
+
+        if(empty($this->errors)){
+            $userFound = $this->buscarPorEmail($params['usu_email']);
+            if(empty($userFound)){
+                $this->errors['usu_email'] = "E-mail não encontrado";
+                return false;
+            }else{
+                if(password_verify($params['usu_senha'], $userFound['usu_senha'])){
+                    return $this->safeData($userFound);
+                }else{
+                    $this->errors['usu_senha'] = "Senha incorreta";
+                    return false;
+                }
+            }
+        }else{
+            return false;
+        }
+    }
+
+    public function safeData($params){
+        unset($params['usu_senha']);
+        unset($params['usu_excluido']);
+        unset($params['usu_token']);
+
+        return $params;
+    }
+
     public function validate($params){
-        $defaultMessage = "Campo obrigatório";
         
         // usu_nome
         if(isset($params['usu_nome'])){
             if(strlen($params['usu_nome']) > 80){
-                $this->errors['usu_nome'] = $defaultMessage;
+                $this->errors['usu_nome'] = $this->defaultMessage;
             }
 
             if(empty($params['usu_nome'])){
-                $this->errors['usu_nome'] = $defaultMessage;
+                $this->errors['usu_nome'] = $this->defaultMessage;
             }
         }else{
-            $this->errors['usu_nome'] = $defaultMessage;
+            $this->errors['usu_nome'] = $this->defaultMessage;
         }
 
 
         // usu_sobrenome
         if(isset($params['usu_sobrenome'])){
             if(strlen($params['usu_sobrenome']) > 80){
-                $this->errors['usu_sobrenome'] = $defaultMessage;
+                $this->errors['usu_sobrenome'] = $this->defaultMessage;
             }
         }
 
@@ -66,17 +113,17 @@ class Usuario extends modelHelper{
             }   
 
             if(empty($params['usu_email'])){
-                $this->errors['usu_email'] = $defaultMessage;
+                $this->errors['usu_email'] = $this->defaultMessage;
             }
         }else{
-            $this->errors['usu_email'] = $defaultMessage;
+            $this->errors['usu_email'] = $this->defaultMessage;
         }
 
 
         // usu_senha
         if(isset($params['usu_senha'])){
             if(empty($params['usu_senha'])){
-                $this->errors['usu_senha'] = $defaultMessage;
+                $this->errors['usu_senha'] = $this->defaultMessage;
             }
 
             if(isset($params['repita_senha'])){
@@ -85,7 +132,7 @@ class Usuario extends modelHelper{
                 }
             }
         }else{
-            $this->errors['usu_senha'] = $defaultMessage;
+            $this->errors['usu_senha'] = $this->defaultMessage;
         }
 
         if(!empty($this->errors)){
