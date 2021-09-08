@@ -8,6 +8,7 @@ class homeController extends controllerHelper{
         $data['css'] = 'home.css';
         $data['js'] = 'home.js';
         $data['title'] = "Minha carteira";
+        $data['user_data'] = $_SESSION['user_data'];
         
         $this->loadTemplate('home', $data);
     }
