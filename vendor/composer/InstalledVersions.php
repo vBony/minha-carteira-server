@@ -24,24 +24,24 @@ class InstalledVersions
 private static $installed = array (
   'root' => 
   array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
+    'pretty_version' => 'dev-develop',
+    'version' => 'dev-develop',
     'aliases' => 
     array (
     ),
-    'reference' => '156d902be8ce532c47f3a642f669042a3c607355',
+    'reference' => '383c18a624f2961d1acee56ececc66091c915bf6',
     'name' => 'conta/quero-emprego-web',
   ),
   'versions' => 
   array (
     'conta/quero-emprego-web' => 
     array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
+      'pretty_version' => 'dev-develop',
+      'version' => 'dev-develop',
       'aliases' => 
       array (
       ),
-      'reference' => '156d902be8ce532c47f3a642f669042a3c607355',
+      'reference' => '383c18a624f2961d1acee56ececc66091c915bf6',
     ),
     'symfony/deprecation-contracts' => 
     array (
@@ -54,12 +54,12 @@ private static $installed = array (
     ),
     'symfony/dotenv' => 
     array (
-      'pretty_version' => 'v5.3.0',
-      'version' => '5.3.0.0',
+      'pretty_version' => 'v5.3.7',
+      'version' => '5.3.7.0',
       'aliases' => 
       array (
       ),
-      'reference' => '1ac423fcc9548709077f90aca26c733cdb7e6e5c',
+      'reference' => '99a18c2e23f4d901c36cea2012f9f1a8e25e99e4',
     ),
   ),
 );

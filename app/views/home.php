@@ -134,14 +134,40 @@
       </div>
       <div class="modal-body">
         <div class="row">
-            <div class="lg-12">
-                <input class="form-control form-control-lg" type="text" placeholder="Valor" aria-label=".form-control-lg example">
+
+            <div class="input-group lg-12">
+                <span class="input-group-text" id="basic-addon1">R$</span>
+                <input type="text" class="form-control money-input" placeholder="Valor" id="valor_receita" aria-label="Valor" aria-describedby="basic-addon1">
+            </div>
+
+            <div class="col-12 mt-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="gridCheck">
+                    <label class="form-check-label" for="gridCheck">
+                        Já recebi
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <label for="exampleInputEmail1" class="form-label">Data de recebimento</label>
+                <input type="date" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+            </div>
+
+            <div class="mb-3 lg-12 mt-3">
+                <label for="tags" class="form-label">Categoria</label>
+                <select class="form-select" id="tags" aria-label="Default select example">
+                    <option selected></option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                </select>
             </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-success">Salvar</button>
       </div>
     </div>
   </div>
