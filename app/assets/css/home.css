@@ -31,3 +31,7 @@
 .fta:hover{
     color: #DC3545 !important;
 }
+
+.form-label{
+    margin-bottom: -10px !important;
+}
