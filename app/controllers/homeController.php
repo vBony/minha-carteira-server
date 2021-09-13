@@ -24,6 +24,35 @@ class homeController extends controllerHelper{
         $this->loadTemplate('home', $data);
     }
 
+    public function categorias(){
+        $Categorias = new Categorias();
+        if(isset($_POST['tipo']) && !empty($_POST['tipo'])){
+            $tipo = $_POST['tipo'];
+            $data['categorias'] = $Categorias->buscar($tipo);
+
+            $this->sendJson($data);
+        }
+    }
+
+    public function inserirReceita(){
+        $Transacoes = new Transacoes();
+
+        $data = $_POST;
+
+        $data['tra_valor'] = isset($data['tra_valor']) && !empty($data['tra_valor']) ? $this->changeToFloat($data['tra_valor']) : null;
+
+        if(!$Transacoes->validate($data)){
+            $this->sendJson(array("errors" => $Transacoes->errors));
+        }else{
+            $Transacoes->inserir($data);
+            $this->sendJson(array('messages' => 'success'));
+        }
+    }
+
+    private function changeToFloat($value){
+        return (float) number_format(str_replace(",",".",str_replace(".","",$value)), 2, '.', '');
+    }
+
     private function validarMesAno($ma){
         if(empty($ma)){
             return false;

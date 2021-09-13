@@ -15,6 +15,7 @@
     <script src="<?=$base_url?>app/assets/libraries/jquery.mask.min.js"></script>
     <script src="<?=$base_url?>app/assets/js/<?=$js?>"></script>
     <link rel="stylesheet" href="<?=$base_url?>app/assets/css/<?=$css?>">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
