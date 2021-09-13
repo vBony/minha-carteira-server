@@ -56,7 +56,7 @@
                         <i class="fas fa-plus text-white"></i> Novo
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalReceita" type="button">Receita <i class="fas fa-arrow-up text-success"></i></button></li>
+                        <li><button class="dropdown-item" id="btn-modal-receita" data-bs-toggle="modal" data-bs-target="#modalReceita" type="button">Receita <i class="fas fa-arrow-up text-success"></i></button></li>
                         <li><button class="dropdown-item" type="button">Despesa <i class="fas fa-arrow-down text-danger"></i></button></li>
                     </ul>
                 </div>
@@ -133,41 +133,51 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="row">
-
-            <div class="input-group lg-12">
-                <span class="input-group-text" id="basic-addon1">R$</span>
-                <input type="text" class="form-control money-input" placeholder="Valor" id="valor_receita" aria-label="Valor" aria-describedby="basic-addon1">
-            </div>
-
-            <div class="col-12 mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="gridCheck">
-                    <label class="form-check-label" for="gridCheck">
-                        Já recebi
-                    </label>
+        <div class="row ">
+            <form id="form-receita">
+                <div class="input-group lg-12">
+                    <span class="input-group-text" id="basic-addon1">R$</span>
+                    <input name="tra_valor" type="text" class="form-control money-input" placeholder="Valor" id="valor_receita" aria-label="Valor" aria-describedby="basic-addon1">
+                    <div class="invalid-feedback" id="msg_tra_valor"></div>
                 </div>
-            </div>
+    
+                <div class="col-12 mt-3">
+                    <div class="form-check">
+                        <label class="form-check-label" for="gridCheck">
+                            <input class="form-check-input" type="checkbox" id="gridCheck" name="tra_situacao">
+                            Já recebi
+                        </label>
+                    </div>
+                </div>
+    
+                <div class="mt-3">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <input name="tra_descricao" type="text" class="form-control" id="descricao">
+                    <div class="invalid-feedback" id="msg_tra_descricao"></div>
+                </div>
+    
+                <div class="mt-3">
+                    <label for="data_recebimento" class="form-label">Data de recebimento</label>
+                    <input name="tra_data" type="date" class="form-control" id="data_recebimento">
+                    <div class="invalid-feedback" id="msg_tra_data"></div>
+                </div>
+    
+                <div class="mb-3 lg-12 mt-3">
+                    <label for="tags" class="form-label">Categoria</label>
+                    <select name="tra_categoria" class="form-select" id="tags">
+                        <option selected>Selecione</option>
+                        <option value="new">Criar nova categoria</option>
+                    </select>
+                    <div class="invalid-feedback" id="msg_tra_categoria"></div>
+                </div>
 
-            <div class="mt-3">
-                <label for="exampleInputEmail1" class="form-label">Data de recebimento</label>
-                <input type="date" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-            </div>
-
-            <div class="mb-3 lg-12 mt-3">
-                <label for="tags" class="form-label">Categoria</label>
-                <select class="form-select" id="tags" aria-label="Default select example">
-                    <option selected></option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                </select>
-            </div>
+                <input type="hidden" name="tra_tipo" value="2">
+            </form>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-        <button type="button" class="btn btn-success">Salvar</button>
+        <button type="button" class="btn btn-success" id="salvar-receita">Salvar</button>
       </div>
     </div>
   </div>
