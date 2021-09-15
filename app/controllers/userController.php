@@ -41,6 +41,7 @@ class userController extends controllerHelper{
     public function loginApi(){
         $Usuario = new Usuario();
         $data = $_POST;
+
         if(!$Usuario->login($data)){
             $this->sendJson(array("errors" => $Usuario->errors));
         }else{  
