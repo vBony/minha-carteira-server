@@ -1,27 +1,28 @@
 <?php
-class homeController extends controllerHelper{
+class dashboardController extends controllerHelper{
     public function index(){
-        $this->privatePage();
-
         $data = array();
+        $request = $_POST;
 
-        $data['css'] = 'home.css';
-        $data['js'] = 'home.js';
-        $data['title'] = "Minha carteira";
-        $data['user_data'] = $_SESSION['user_data'];
-        $data['base_url'] = $_ENV['BASE_URL'];
+        $Sessao = new Sessao();
+        $Usuario = new Usuario();
 
-        if(!isset($_GET['mesano']) || !$this->validarMesAno($_GET['mesano'])){
-            $data['mes_ano'] = date('m-Y');
-            $data['prox_mesano'] = $this->getMesAno($data['mes_ano'], 'after');
-            $data['ant_mesano'] = $this->getMesAno($data['mes_ano'], 'before');
+        if(!empty($request['access_token']) && $Sessao->validarToken($request['access_token'])){
+            $sessao = $Sessao->buscarValidoPorToken($request['access_token']);
+            $mesano = date('m-Y');
+
+            $data['user'] = $Usuario->safeData($Usuario->buscar($sessao['ss_usu_id']));
+            $data['access_token'] = $sessao['ss_token'];
+            $data['mesanos'] = [
+                'mes_ano' => $mesano,
+                'prox_mesano' => $this->getMesAno($mesano, 'after'),
+                'ant_mesano' =>  $this->getMesAno($mesano, 'before')
+            ];
+
+            $this->sendJson(['data' => $data]);
         }else{
-            $data['mes_ano'] = $_GET['mesano'];
-            $data['prox_mesano'] = $this->getMesAno($data['mes_ano'], 'after');
-            $data['ant_mesano'] = $this->getMesAno($data['mes_ano'], 'before');
+            return http_response_code(401);
         }
-
-        $this->loadTemplate('home', $data);
     }
 
     public function categorias(){
@@ -36,16 +37,33 @@ class homeController extends controllerHelper{
 
     public function inserirReceita(){
         $Transacoes = new Transacoes();
+        $Sessao = new Sessao();
+        $Usuario = new Usuario();
 
-        $data = $_POST;
+        $data = $_POST['data'];
+        $mesano = $_POST['mesano'];
+        $access_token = isset($_POST['access_token']) && !empty($_POST['access_token']) ? $_POST['access_token'] : null;
+
+        if(empty($access_token) && !$Sessao->validarToken($access_token)){
+            return http_response_code(401);
+        }
+
+        $sessao = $Sessao->buscarValidoPorToken($access_token);
+        $usuario = $Usuario->buscar($sessao['ss_usu_id']);
+        $sessao = $Sessao->setSessao($usuario['usu_id']);
 
         $data['tra_valor'] = isset($data['tra_valor']) && !empty($data['tra_valor']) ? $this->changeToFloat($data['tra_valor']) : null;
 
         if(!$Transacoes->validate($data)){
             $this->sendJson(array("errors" => $Transacoes->errors));
         }else{
-            $Transacoes->inserir($data);
-            $this->sendJson(array('messages' => 'success'));
+            $Transacoes->inserir($data, $usuario['usu_id']);
+            $transacoes = $Transacoes->buscarPorMesano($usuario['usu_id'], $mesano);
+
+            $this->sendJson([
+                'access_token' => $sessao['ss_token'],
+                'transacoes' => $transacoes,
+            ]);
         }
     }
 

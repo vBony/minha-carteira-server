@@ -5,7 +5,7 @@ class Transacoes extends modelHelper{
     public $errors;
     public $defaultMessage = "Campo obrigatório";
 
-    public function inserir($params){
+    public function inserir($params, $idUsuario){
         $sql  = "INSERT INTO {$this->tabela} ";
         $sql .= "(tra_id, tra_tipo, tra_data, tra_descricao, tra_categoria, tra_valor, tra_situacao, tra_anexo, tra_usu_id, tra_mesano) ";
         $sql .= "VALUES ";
@@ -17,19 +17,34 @@ class Transacoes extends modelHelper{
         $sql->bindValue(":descricao", $params['tra_descricao']);
         $sql->bindValue(":categoria", $params['tra_categoria']);
         $sql->bindValue(":valor", $params['tra_valor']);
-        if(isset($params['tra_situacao'])){
-            $sql->bindValue(":situacao", 1);
-        }else{
-            $sql->bindValue(":situacao", 0);
-        }
-        $sql->bindValue(":idUsuario", $_SESSION['user_data']['usu_id']);
+        $sql->bindValue(":situacao", $params['tra_situacao']);
+        $sql->bindValue(":idUsuario", $idUsuario);
         $sql->bindValue(":mesano", $this->getMesano($params['tra_data']));
 
         $sql->execute();
     }
 
+    public function buscarPorMesano($idUser, $mesano){
+        $mesano = $this->formatarMesAnoParaBanco($mesano);
+        $sql = " SELECT * FROM {$this->tabela} WHERE tra_mesano = :mesano AND tra_usu_id = :idUser ";
+
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":mesano", $mesano);
+        $sql->bindValue(":idUser", $idUser);
+        $sql->execute();
+        if($sql->rowCount() > 0){
+            return $sql->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+
     private function getMesano($data){
         $dataArr = explode('-', $data);
+
+        return $dataArr[0].$dataArr[1];
+    }
+
+    private function formatarMesAnoParaBanco($mesano){
+        $dataArr = explode('-', $mesano);
 
         return $dataArr[1].$dataArr[0];
     }
@@ -48,7 +63,6 @@ class Transacoes extends modelHelper{
         }
 
         if(isset($params['tra_data'])){
-            
             if(empty($params['tra_data'])){
                 $this->errors['tra_data'] = $this->defaultMessage;
             }
@@ -61,8 +75,6 @@ class Transacoes extends modelHelper{
                     $this->errors['tra_data'] = "Data inválida";
                 }
             }
-
-            
         }else{
             $this->errors['tra_data'] = $this->defaultMessage;
         }
