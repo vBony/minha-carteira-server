@@ -17,11 +17,11 @@ class Usuario extends modelHelper{
         }
     }
 
-    public function cadastrar($params){
+    public function cadastrar($params, $retornarId = false){
         $sql  = "INSERT INTO {$this->tabela} ";
-        $sql .= "(usu_id, usu_nome, usu_sobrenome, usu_profissao, usu_senha, usu_data_criacao, usu_excluido, usu_email, usu_foto, usu_token) ";
+        $sql .= "(usu_id, usu_nome, usu_sobrenome, usu_profissao, usu_senha, usu_data_criacao, usu_excluido, usu_email, usu_foto) ";
         $sql .= "VALUES ";
-        $sql .= "(NULL, :nome, :sobrenome, :profissao, :senha, :dataCriacao, 0, :email, NULL, NULL) ";
+        $sql .= "(NULL, :nome, :sobrenome, :profissao, :senha, :dataCriacao, 0, :email, NULL) ";
 
         $sql = $this->db->prepare($sql);
         $sql->bindValue(":nome", $params['usu_nome']);
@@ -30,8 +30,13 @@ class Usuario extends modelHelper{
         $sql->bindValue(":senha", password_hash($params['usu_senha'], PASSWORD_DEFAULT));
         $sql->bindValue(":dataCriacao", date('Y-m-d'));
         $sql->bindValue(":email", $params['usu_email']);
-
         $sql->execute();
+
+        if($retornarId){
+           return $this->db->lastInsertId();
+        }else{
+            return true;
+        }
     }
 
     public function buscarPorEmail($email){
@@ -135,12 +140,6 @@ class Usuario extends modelHelper{
         if(isset($params['usu_senha'])){
             if(empty($params['usu_senha'])){
                 $this->errors['usu_senha'] = $this->defaultMessage;
-            }
-
-            if(isset($params['repita_senha'])){
-                if($params['repita_senha'] != $params['usu_senha']){
-                    $this->errors['usu_senha'] = "Os campos não coincidem";
-                }
             }
         }else{
             $this->errors['usu_senha'] = $this->defaultMessage;
