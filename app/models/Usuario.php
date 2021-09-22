@@ -5,6 +5,17 @@ class Usuario extends modelHelper{
     public $errors;
     public $defaultMessage = "Campo obrigatório";
 
+    public function buscar($id){
+        $sql = "SELECT * FROM {$this->tabela} WHERE usu_id = :id";
+
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":id", $id);
+        $sql->execute();
+
+        if($sql->rowCount() > 0){
+            return $sql->fetch(PDO::FETCH_ASSOC);
+        }
+    }
 
     public function cadastrar($params){
         $sql  = "INSERT INTO {$this->tabela} ";
