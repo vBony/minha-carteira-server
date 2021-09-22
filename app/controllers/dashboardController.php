@@ -9,6 +9,7 @@ class dashboardController extends controllerHelper{
 
         if(!empty($request['access_token']) && $Sessao->validarToken($request['access_token'])){
             $sessao = $Sessao->buscarValidoPorToken($request['access_token']);
+
             $mesano = date('m-Y');
 
             $data['user'] = $Usuario->safeData($Usuario->buscar($sessao['ss_usu_id']));
