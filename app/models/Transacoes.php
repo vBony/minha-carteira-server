@@ -24,16 +24,62 @@ class Transacoes extends modelHelper{
         $sql->execute();
     }
 
-    public function buscarPorMesano($idUser, $mesano){
+    public function buscar($idUser, $mesano){
         $mesano = $this->formatarMesAnoParaBanco($mesano);
-        $sql = " SELECT * FROM {$this->tabela} WHERE tra_mesano = :mesano AND tra_usu_id = :idUser ";
+        $sql  = " SELECT {$this->tabela}.*, cat_id, cat_descricao FROM {$this->tabela} "; 
+        $sql .= " INNER JOIN categorias ON tra_categoria = cat_id ";
+        $sql .= " WHERE tra_mesano = :mesano AND tra_usu_id = :idUser ORDER BY tra_id desc ";
 
         $sql = $this->db->prepare($sql);
         $sql->bindValue(":mesano", $mesano);
         $sql->bindValue(":idUser", $idUser);
         $sql->execute();
         if($sql->rowCount() > 0){
-            return $sql->fetchAll(PDO::FETCH_ASSOC);
+            $transacoes = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach($transacoes as $i => $transacao){
+                $transacao['tra_data'] = date('d/m/Y', strtotime($transacao['tra_data']));
+                $transacao['tra_valor'] = $this->floatParaReal($transacao['tra_valor']);
+
+                $transacoes[$i] = $transacao;
+            }
+
+            return $transacoes;
+        }
+    }
+
+    public function calcularReceitas($idUser, $mesano, $paraResposta = false){
+        $tipo = 2;
+        $mesano = $this->formatarMesAnoParaBanco($mesano);
+
+        $sql  = " SELECT sum(tra_valor) as tra_valor"; 
+        $sql .= " FROM transacoes";
+        $sql .= " WHERE tra_usu_id = :idUser ";
+        $sql .= " AND tra_tipo = :tipo ";
+        $sql .= " AND tra_mesano = :mesano ";
+
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":idUser", $idUser);
+        $sql->bindValue(":tipo", $tipo);
+        $sql->bindValue(":mesano", $mesano);
+        $sql->execute();
+
+        if($paraResposta){
+            $valor = $sql->fetch(PDO::FETCH_ASSOC);
+            return $this->floatParaReal( $valor['tra_valor'] );
+        }
+    }
+
+    private function floatParaReal($num){
+        if (strpos($num, "0") == 0){
+            $num = str_replace(',', '.', $num);
+            $num = number_format($num, 2, ',', '.');
+            return $num;
+        }else{
+            $num = str_replace('.', '', $num);
+            $num = str_replace(',', '.', $num);
+            $num = number_format($num, 2, ',', '.');
+            return $num;
         }
     }
 
