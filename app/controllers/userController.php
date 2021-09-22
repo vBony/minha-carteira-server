@@ -32,24 +32,20 @@ class userController extends controllerHelper{
     }
 
     public function login(){
-        $data = array();
-        $data['base_url'] = $_ENV['BASE_URL'];
-
-        $this->loadView('login', $data);
-    }
-
-    public function loginApi(){
         $Usuario = new Usuario();
-        $data = $_POST;
+        $Sessao = new Sessao();
+        $data = $_POST['data'];
 
         if(!$Usuario->login($data)){
             $this->sendJson(array("errors" => $Usuario->errors));
         }else{  
-            $user = $Usuario->login($data); 
-            $_SESSION['user_data'] = $user;
-            $_SESSION['logged'] = true;
+            $user = $Usuario->login($data);
 
-            $this->sendJson(array('messages' => 'success'));
+            $sessao = $Sessao->setSessao($user['usu_id']);
+
+            $this->sendJson([
+                'access_token' => $sessao['ss_token']
+            ]);
         }
     }
 }
