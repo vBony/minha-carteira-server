@@ -6,7 +6,4 @@ $routes['/api/criar-conta'] = '/user/register';
 $routes['/login'] = '/user/login';
 <<<<<<< Updated upstream
 $routes['/api/login'] = '/user/loginApi';
-=======
-$routes['/api/login'] = '/user/loginApi';
 $routes['/dashboard/inserir-receita'] = '/dashboard/inserirReceita';
->>>>>>> Stashed changes

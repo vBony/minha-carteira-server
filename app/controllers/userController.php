@@ -33,13 +33,9 @@ class userController extends controllerHelper{
 
     public function login(){
         $Usuario = new Usuario();
-<<<<<<< Updated upstream
-        $data = $_POST;
-=======
         $Sessao = new Sessao();
         $data = $_POST['data'];
 
->>>>>>> Stashed changes
         if(!$Usuario->login($data)){
             $this->sendJson(array("errors" => $Usuario->errors));
         }else{  

@@ -25,8 +25,6 @@ class dashboardController extends controllerHelper{
         }
     }
 
-<<<<<<< Updated upstream:app/controllers/homeController.php
-=======
     public function categorias(){
         $Categorias = new Categorias();
         if(isset($_POST['tipo']) && !empty($_POST['tipo'])){
@@ -73,7 +71,6 @@ class dashboardController extends controllerHelper{
         return (float) number_format(str_replace(",",".",str_replace(".","",$value)), 2, '.', '');
     }
 
->>>>>>> Stashed changes:app/controllers/dashboardController.php
     private function validarMesAno($ma){
         if(empty($ma)){
             return false;
