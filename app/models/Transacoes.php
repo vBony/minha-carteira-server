@@ -4,6 +4,8 @@ class Transacoes extends modelHelper{
     private $tabela = "transacoes";
     public $errors;
     public $defaultMessage = "Campo obrigatório";
+    private $id_receita = 2;
+    private $id_despesa = 1;
 
     public function inserir($params, $idUsuario){
         $sql  = "INSERT INTO {$this->tabela} ";
@@ -48,13 +50,30 @@ class Transacoes extends modelHelper{
         }
     }
 
-    public function calcularReceitas($idUser, $mesano, $paraResposta = false){
-        $tipo = 2;
+    public function calcularResumosMes($idUser, $mesano){
+        $receitasTotal = (float) $this->calcularTransacoes($idUser, $mesano, $this->id_receita);
+        $despesasTotal = (float) $this->calcularTransacoes($idUser, $mesano, $this->id_despesa);
+
+        $receitasSemPendentes = (float) $this->calcularTransacoes($idUser, $mesano, $this->id_receita, true);
+        $despesasSemPendentes = (float) $this->calcularTransacoes($idUser, $mesano, $this->id_despesa, true);
+
+        return[
+            'saldo_atual' => $this->floatParaReal( $receitasSemPendentes - $despesasSemPendentes ),
+            'receitas' => $this->floatParaReal( $receitasTotal ),
+            'despesas' => $this->floatParaReal( $despesasTotal ),
+            'saldo_mensal' => $this->floatParaReal( $receitasTotal - $despesasTotal ),
+        ];
+    }
+
+    public function calcularTransacoes($idUser, $mesano, $tipo, $ignoraPendentes = false){
         $mesano = $this->formatarMesAnoParaBanco($mesano);
 
         $sql  = " SELECT sum(tra_valor) as tra_valor"; 
         $sql .= " FROM transacoes";
         $sql .= " WHERE tra_usu_id = :idUser ";
+        if($ignoraPendentes){
+            $sql .= " AND tra_situacao != 0 ";
+        }
         $sql .= " AND tra_tipo = :tipo ";
         $sql .= " AND tra_mesano = :mesano ";
 
@@ -64,23 +83,12 @@ class Transacoes extends modelHelper{
         $sql->bindValue(":mesano", $mesano);
         $sql->execute();
 
-        if($paraResposta){
-            $valor = $sql->fetch(PDO::FETCH_ASSOC);
-            return $this->floatParaReal( $valor['tra_valor'] );
-        }
+        $valor = $sql->fetch(PDO::FETCH_ASSOC);
+            return $valor['tra_valor'];
     }
 
     private function floatParaReal($num){
-        if (strpos($num, "0") == 0){
-            $num = str_replace(',', '.', $num);
-            $num = number_format($num, 2, ',', '.');
-            return $num;
-        }else{
-            $num = str_replace('.', '', $num);
-            $num = str_replace(',', '.', $num);
-            $num = number_format($num, 2, ',', '.');
-            return $num;
-        }
+        return number_format($num,2,",",".");
     }
 
     private function getMesano($data){

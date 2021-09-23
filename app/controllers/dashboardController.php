@@ -22,10 +22,7 @@ class dashboardController extends controllerHelper{
                 'ant_mesano' =>  $this->getMesAno($mesano, 'before')
             ];
 
-            $data['resumo'] = [
-                'saldo_atual' => 0,
-                'receitas' => $Transacoes->calcularReceitas($sessao['ss_usu_id'], $mesano, true)
-            ];
+            $data['resumo'] = $Transacoes->calcularResumosMes($sessao['ss_usu_id'], $mesano);
 
             $data['transacoes'] = $Transacoes->buscar($sessao['ss_usu_id'], $mesano);
 
@@ -45,7 +42,7 @@ class dashboardController extends controllerHelper{
         }
     }
 
-    public function inserirReceita(){
+    public function inserirTransacao(){
         $Transacoes = new Transacoes();
         $Sessao = new Sessao();
         $Usuario = new Usuario();
@@ -73,6 +70,7 @@ class dashboardController extends controllerHelper{
             $this->sendJson([
                 'access_token' => $sessao['ss_token'],
                 'transacoes' => $transacoes,
+                'resumo' => $Transacoes->calcularResumosMes($usuario['usu_id'], $mesano)
             ]);
         }
     }
