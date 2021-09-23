@@ -9,16 +9,22 @@ class dashboardController extends controllerHelper{
 
         if(!empty($request['access_token']) && $Sessao->validarToken($request['access_token'])){
             $sessao = $Sessao->buscarValidoPorToken($request['access_token']);
+            $Transacoes = new Transacoes();
 
             $mesano = date('m-Y');
 
             $data['user'] = $Usuario->safeData($Usuario->buscar($sessao['ss_usu_id']));
             $data['access_token'] = $sessao['ss_token'];
+
             $data['mesanos'] = [
                 'mes_ano' => $mesano,
                 'prox_mesano' => $this->getMesAno($mesano, 'after'),
                 'ant_mesano' =>  $this->getMesAno($mesano, 'before')
             ];
+
+            $data['resumo'] = $Transacoes->calcularResumosMes($sessao['ss_usu_id'], $mesano);
+
+            $data['transacoes'] = $Transacoes->buscar($sessao['ss_usu_id'], $mesano);
 
             $this->sendJson(['data' => $data]);
         }else{
@@ -36,7 +42,7 @@ class dashboardController extends controllerHelper{
         }
     }
 
-    public function inserirReceita(){
+    public function inserirTransacao(){
         $Transacoes = new Transacoes();
         $Sessao = new Sessao();
         $Usuario = new Usuario();
@@ -59,11 +65,12 @@ class dashboardController extends controllerHelper{
             $this->sendJson(array("errors" => $Transacoes->errors));
         }else{
             $Transacoes->inserir($data, $usuario['usu_id']);
-            $transacoes = $Transacoes->buscarPorMesano($usuario['usu_id'], $mesano);
+            $transacoes = $Transacoes->buscar($usuario['usu_id'], $mesano);
 
             $this->sendJson([
                 'access_token' => $sessao['ss_token'],
                 'transacoes' => $transacoes,
+                'resumo' => $Transacoes->calcularResumosMes($usuario['usu_id'], $mesano)
             ]);
         }
     }
