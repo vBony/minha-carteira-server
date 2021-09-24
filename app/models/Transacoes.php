@@ -85,6 +85,21 @@ class Transacoes extends modelHelper{
         }
     }
 
+    public function deletar($id, $idUser){
+        if(!empty($this->buscarPorId($id, $idUser))){
+            $sql = " DELETE FROM {$this->tabela} WHERE tra_usu_id = :idUser AND tra_id = :id ";
+
+            $sql = $this->db->prepare($sql);
+            $sql->bindValue(":idUser", $idUser);
+            $sql->bindValue(":id", $id);
+            $sql->execute();
+            
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function buscarPorId($id, $idUsuario){
         $sql  = " SELECT {$this->tabela}.*, cat_id, cat_descricao FROM {$this->tabela} "; 
         $sql .= " INNER JOIN categorias ON tra_categoria = cat_id ";

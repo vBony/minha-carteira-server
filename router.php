@@ -7,3 +7,5 @@ $routes['/api/login'] = '/user/loginApi';
 $routes['/dashboard/inserir-transacao'] = '/dashboard/inserirTransacao';
 $routes['/dashboard/buscar-transacao'] = '/dashboard/buscarTransacao';
 $routes['/dashboard/efetivar-transacao'] = '/dashboard/efetivarTransacao';
+$routes['/dashboard/deletar-transacao'] = '/dashboard/deletarTransacao';
+$routes['/dashboard/buscar-mesano'] = '/dashboard/buscarPorMesAno';
