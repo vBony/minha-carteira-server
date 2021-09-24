@@ -48,6 +48,8 @@ class dashboardController extends controllerHelper{
         $Usuario = new Usuario();
 
         $data = $_POST['data'];
+        $data['tra_situacao'] = $data['tra_situacao'] == 'true' ? 1 : 0;
+
         $mesano = $_POST['mesano'];
         $access_token = isset($_POST['access_token']) && !empty($_POST['access_token']) ? $_POST['access_token'] : null;
 
@@ -104,6 +106,39 @@ class dashboardController extends controllerHelper{
             ]);
         }else{
             return http_response_code(401);
+        }
+    }
+
+    public function efetivarTransacao(){
+        $Sessao = new Sessao();
+        $Usuario = new Usuario();
+        $Transacao = new Transacoes();
+
+        $idTransacao = $_POST['id'];
+        $access_token = $_POST['access_token'];
+        $mesano = $_POST['mesano'];
+
+        if(empty($access_token) && !$Sessao->validarToken($access_token)){
+            return http_response_code(401);
+        }
+
+        $num1 = 24.4;
+        $num2 = 50.2;
+
+        $sessao = $Sessao->buscarValidoPorToken($access_token);
+        $usuario = $Usuario->buscar($sessao['ss_usu_id']);
+
+        $sessao = $Sessao->setSessao($usuario['usu_id']);
+
+        if(!$Transacao->efetivar($idTransacao, $usuario['usu_id'])){
+            return http_response_code(401);
+        }else{
+            $this->sendJson([
+                'access_token' => $sessao['ss_token'],
+                'transacoes' => $Transacao->buscar($usuario['usu_id'], $mesano),
+                'resumo' => $Transacao->calcularResumosMes($usuario['usu_id'], $mesano),
+                'teste' => $num1 - $num2
+            ]);
         }
     }
 

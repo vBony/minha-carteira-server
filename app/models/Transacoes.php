@@ -37,7 +37,7 @@ class Transacoes extends modelHelper{
         $sql->bindValue(":descricao", $params['tra_descricao']);
         $sql->bindValue(":categoria", $params['tra_categoria']);
         $sql->bindValue(":valor", $params['tra_valor']);
-        $sql->bindValue(":situacao", $params['tra_situacao'] == true ? 1 : 0);
+        $sql->bindValue(":situacao", $params['tra_situacao']);
         $sql->bindValue(":mesano", $this->getMesano($params['tra_data']));
         $sql->bindValue(":idUsuario", $idUsuario);
         $sql->bindValue(":id", $params['tra_id']);
@@ -67,6 +67,21 @@ class Transacoes extends modelHelper{
             }
 
             return $transacoes;
+        }
+    }
+
+    public function efetivar($id, $idUser){
+        if(!empty($this->buscarPorId($id, $idUser))){
+            $sql = " UPDATE {$this->tabela} SET tra_situacao = 1 WHERE tra_usu_id = :idUser AND tra_id = :id ";
+
+            $sql = $this->db->prepare($sql);
+            $sql->bindValue(":idUser", $idUser);
+            $sql->bindValue(":id", $id);
+            $sql->execute();
+            
+            return true;
+        }else{
+            return false;
         }
     }
 
