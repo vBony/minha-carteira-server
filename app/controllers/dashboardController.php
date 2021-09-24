@@ -122,9 +122,6 @@ class dashboardController extends controllerHelper{
             return http_response_code(401);
         }
 
-        $num1 = 24.4;
-        $num2 = 50.2;
-
         $sessao = $Sessao->buscarValidoPorToken($access_token);
         $usuario = $Usuario->buscar($sessao['ss_usu_id']);
 
@@ -137,9 +134,64 @@ class dashboardController extends controllerHelper{
                 'access_token' => $sessao['ss_token'],
                 'transacoes' => $Transacao->buscar($usuario['usu_id'], $mesano),
                 'resumo' => $Transacao->calcularResumosMes($usuario['usu_id'], $mesano),
-                'teste' => $num1 - $num2
             ]);
         }
+    }
+
+    public function deletarTransacao(){
+        $Sessao = new Sessao();
+        $Usuario = new Usuario();
+        $Transacao = new Transacoes();
+
+        $idTransacao = $_POST['id'];
+        $access_token = $_POST['access_token'];
+        $mesano = $_POST['mesano'];
+
+        if(empty($access_token) && !$Sessao->validarToken($access_token)){
+            return http_response_code(401);
+        }
+
+        $sessao = $Sessao->buscarValidoPorToken($access_token);
+        $usuario = $Usuario->buscar($sessao['ss_usu_id']);
+
+        $sessao = $Sessao->setSessao($usuario['usu_id']);
+
+        if(!$Transacao->deletar($idTransacao, $usuario['usu_id'])){
+            return http_response_code(401);
+        }else{
+            $this->sendJson([
+                'access_token' => $sessao['ss_token'],
+                'transacoes' => $Transacao->buscar($usuario['usu_id'], $mesano),
+                'resumo' => $Transacao->calcularResumosMes($usuario['usu_id'], $mesano),
+            ]);
+        }
+    }
+
+    public function buscarPorMesAno(){
+        $Sessao = new Sessao();
+        $Usuario = new Usuario();
+        $Transacoes = new Transacoes();
+
+        $access_token = $_POST['access_token'];
+        $mesano = $this->validarMesAno($_POST['mesano']) == false ? date('m-Y') : $_POST['mesano'];
+
+        $sessao = $Sessao->buscarValidoPorToken($access_token);
+        $usuario = $Usuario->buscar($sessao['ss_usu_id']);
+
+        $sessao = $Sessao->setSessao($usuario['usu_id']);
+
+        $mesanos = [
+            'mes_ano' => $mesano,
+            'prox_mesano' => $this->getMesAno($mesano, 'after'),
+            'ant_mesano' =>  $this->getMesAno($mesano, 'before')
+        ];
+
+        return $this->sendJson([
+            'access_token' => $sessao['ss_token'],
+            'mesanos' => $mesanos,
+            'resumo' => $Transacoes->calcularResumosMes($sessao['ss_usu_id'], $mesano),
+            'transacoes' => $Transacoes->buscar($sessao['ss_usu_id'], $mesano)
+        ]);
     }
 
     private function changeToFloat($value){
