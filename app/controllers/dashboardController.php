@@ -64,7 +64,12 @@ class dashboardController extends controllerHelper{
         if(!$Transacoes->validate($data)){
             $this->sendJson(array("errors" => $Transacoes->errors));
         }else{
-            $Transacoes->inserir($data, $usuario['usu_id']);
+            if(isset($data['tra_id']) && !empty($data['tra_id'])){
+                $Transacoes->alterar($data, $usuario['usu_id']);
+            }else{
+                $Transacoes->inserir($data, $usuario['usu_id']);
+            }
+
             $transacoes = $Transacoes->buscar($usuario['usu_id'], $mesano);
 
             $this->sendJson([
@@ -72,6 +77,33 @@ class dashboardController extends controllerHelper{
                 'transacoes' => $transacoes,
                 'resumo' => $Transacoes->calcularResumosMes($usuario['usu_id'], $mesano)
             ]);
+        }
+    }
+
+    public function buscarTransacao(){
+        $Sessao = new Sessao();
+        $Usuario = new Usuario();
+        $Transacoes = new Transacoes();
+
+        $id = $_POST['id'];
+        $access_token = $_POST['access_token'];
+        $mesano = $_POST['mesano'];
+
+        if(empty($access_token) && !$Sessao->validarToken($access_token)){
+            return http_response_code(401);
+        }
+
+        $sessao = $Sessao->buscarValidoPorToken($access_token);
+        $usuario = $Usuario->buscar($sessao['ss_usu_id']);
+
+        $transacao = $Transacoes->buscarPorId($id, $usuario['usu_id']);
+
+        if(!empty($transacao)){
+            $this->sendJson([
+                'transacao' => $transacao
+            ]);
+        }else{
+            return http_response_code(401);
         }
     }
 

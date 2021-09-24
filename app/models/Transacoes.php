@@ -26,6 +26,26 @@ class Transacoes extends modelHelper{
         $sql->execute();
     }
 
+    public function alterar($params, $idUsuario){
+        $sql  = " UPDATE {$this->tabela} SET ";
+        $sql .= " tra_data = :data, tra_descricao = :descricao, tra_categoria = :categoria, ";
+        $sql .= " tra_valor = :valor, tra_situacao = :situacao, tra_mesano = :mesano ";
+        $sql .= " WHERE tra_usu_id = :idUsuario AND tra_id = :id ";
+
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":data", $params['tra_data']);
+        $sql->bindValue(":descricao", $params['tra_descricao']);
+        $sql->bindValue(":categoria", $params['tra_categoria']);
+        $sql->bindValue(":valor", $params['tra_valor']);
+        $sql->bindValue(":situacao", $params['tra_situacao'] == true ? 1 : 0);
+        $sql->bindValue(":mesano", $this->getMesano($params['tra_data']));
+        $sql->bindValue(":idUsuario", $idUsuario);
+        $sql->bindValue(":id", $params['tra_id']);
+
+
+        $sql->execute();
+    }
+
     public function buscar($idUser, $mesano){
         $mesano = $this->formatarMesAnoParaBanco($mesano);
         $sql  = " SELECT {$this->tabela}.*, cat_id, cat_descricao FROM {$this->tabela} "; 
@@ -47,6 +67,26 @@ class Transacoes extends modelHelper{
             }
 
             return $transacoes;
+        }
+    }
+
+    public function buscarPorId($id, $idUsuario){
+        $sql  = " SELECT {$this->tabela}.*, cat_id, cat_descricao FROM {$this->tabela} "; 
+        $sql .= " INNER JOIN categorias ON tra_categoria = cat_id ";
+        $sql .= " WHERE tra_usu_id = :idUser AND tra_id = :id";
+
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":id", $id);
+        $sql->bindValue(":idUser", $idUsuario);
+        $sql->execute();
+
+        if($sql->rowCount() > 0){
+            $transacao = $sql->fetch(PDO::FETCH_ASSOC);
+            $transacao['tra_valor'] = $this->floatParaReal($transacao['tra_valor']);
+
+            return $transacao;
+        }else{
+            return null;
         }
     }
 
