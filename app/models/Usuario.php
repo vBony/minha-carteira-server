@@ -91,11 +91,11 @@ class Usuario extends modelHelper{
     }
 
     private function tratarNome($nome){
-        return ucfirst($nome);
+        return strtolower(ucfirst($nome));
     }
 
     private function tratarProfissao($profissao){
-        return ucwords($profissao);
+        return strtolower(ucwords($profissao));
     }
 
     public function tratarEmail($email){
