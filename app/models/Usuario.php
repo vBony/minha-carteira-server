@@ -24,12 +24,12 @@ class Usuario extends modelHelper{
         $sql .= "(NULL, :nome, :sobrenome, :profissao, :senha, :dataCriacao, 0, :email, NULL) ";
 
         $sql = $this->db->prepare($sql);
-        $sql->bindValue(":nome", $params['usu_nome']);
-        $sql->bindValue(":sobrenome", $params['usu_sobrenome']);
-        $sql->bindValue(":profissao", $params['usu_profissao']);
+        $sql->bindValue(":nome", $this->tratarNome($params['usu_nome']));
+        $sql->bindValue(":sobrenome", $this->tratarNome($params['usu_sobrenome']));
+        $sql->bindValue(":profissao", $this->tratarProfissao($params['usu_profissao']));
         $sql->bindValue(":senha", password_hash($params['usu_senha'], PASSWORD_DEFAULT));
         $sql->bindValue(":dataCriacao", date('Y-m-d'));
-        $sql->bindValue(":email", $params['usu_email']);
+        $sql->bindValue(":email", $this->tratarEmail($params['usu_email']));
         $sql->execute();
 
         if($retornarId){
@@ -88,6 +88,18 @@ class Usuario extends modelHelper{
         }else{
             return false;
         }
+    }
+
+    private function tratarNome($nome){
+        return ucfirst($nome);
+    }
+
+    private function tratarProfissao($profissao){
+        return ucwords($profissao);
+    }
+
+    public function tratarEmail($email){
+        return strtolower($email);
     }
 
     public function safeData($params){
