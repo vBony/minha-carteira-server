@@ -59,7 +59,6 @@ class dashboardController extends controllerHelper{
 
         $sessao = $Sessao->buscarValidoPorToken($access_token);
         $usuario = $Usuario->buscar($sessao['ss_usu_id']);
-        $sessao = $Sessao->setSessao($usuario['usu_id']);
 
         $data['tra_valor'] = isset($data['tra_valor']) && !empty($data['tra_valor']) ? $this->changeToFloat($data['tra_valor']) : null;
 
@@ -125,8 +124,6 @@ class dashboardController extends controllerHelper{
         $sessao = $Sessao->buscarValidoPorToken($access_token);
         $usuario = $Usuario->buscar($sessao['ss_usu_id']);
 
-        $sessao = $Sessao->setSessao($usuario['usu_id']);
-
         if(!$Transacao->efetivar($idTransacao, $usuario['usu_id'])){
             return http_response_code(401);
         }else{
@@ -154,8 +151,6 @@ class dashboardController extends controllerHelper{
         $sessao = $Sessao->buscarValidoPorToken($access_token);
         $usuario = $Usuario->buscar($sessao['ss_usu_id']);
 
-        $sessao = $Sessao->setSessao($usuario['usu_id']);
-
         if(!$Transacao->deletar($idTransacao, $usuario['usu_id'])){
             return http_response_code(401);
         }else{
@@ -173,12 +168,15 @@ class dashboardController extends controllerHelper{
         $Transacoes = new Transacoes();
 
         $access_token = $_POST['access_token'];
+
+        if(empty($access_token) && !$Sessao->validarToken($access_token)){
+            return http_response_code(401);
+        }
+        
         $mesano = $this->validarMesAno($_POST['mesano']) == false ? date('m-Y') : $_POST['mesano'];
 
         $sessao = $Sessao->buscarValidoPorToken($access_token);
         $usuario = $Usuario->buscar($sessao['ss_usu_id']);
-
-        $sessao = $Sessao->setSessao($usuario['usu_id']);
 
         $mesanos = [
             'mes_ano' => $mesano,
