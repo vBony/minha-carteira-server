@@ -31,6 +31,7 @@ class Sessao extends modelHelper{
     public function setSessao($idUser){
         $token = md5($idUser . date('Y-m-d H:i:s') . rand());
         $data = (string) strtotime(date('Y-m-d H:i:s', strtotime("+3 hours")));
+        $ip = password_hash($this->getIpAddress(), PASSWORD_BCRYPT);
         
         $user = $this->buscarPorIdUsuario($idUser);
         if(!empty($user)){
@@ -42,7 +43,7 @@ class Sessao extends modelHelper{
             $sql = $this->db->prepare($sql);
             $sql->bindValue(":token", $token);
             $sql->bindValue(":data", $data);
-            $sql->bindValue(":ip", $this->getIpAddress());
+            $sql->bindValue(":ip", $ip);
             $sql->bindValue(":idUser", $user['ss_usu_id']);
             $sql->execute();
 
@@ -55,7 +56,7 @@ class Sessao extends modelHelper{
             $sql->bindValue(":idUser", $idUser);
             $sql->bindValue(":token", $token);
             $sql->bindValue(":data", $data);
-            $sql->bindValue(":ip", $this->getIpAddress());
+            $sql->bindValue(":ip", $ip);
             $sql->execute();
             
             $id = $this->db->lastInsertId();
@@ -71,16 +72,19 @@ class Sessao extends modelHelper{
         $sql  = " SELECT * FROM {$this->tabela} ";
         $sql .= " WHERE ss_token = :token ";
         $sql .= " AND ss_valido_ate > :dataAtual ";
-        $sql .= " AND ss_endereco = :ip ";
 
         $sql = $this->db->prepare($sql);
         $sql->bindValue(":token", $token);
         $sql->bindValue(":dataAtual", $dataAtual);
-        $sql->bindValue(":ip", $ip);
         $sql->execute();
 
         if($sql->rowCount() > 0){
-            return $sql->fetch(PDO::FETCH_ASSOC);
+            $sessao = $sql->fetch(PDO::FETCH_ASSOC);
+            if(password_verify($ip, $sessao['ss_endereco'])){
+                return $sessao;
+            }else{
+                return null;
+            }
         }else{
             return null;
         }
@@ -88,6 +92,7 @@ class Sessao extends modelHelper{
 
     public function validarToken($token){
         $token = $this->buscarValidoPorToken($token);
+        return $token;
 
         if($token != null){
             return true;
