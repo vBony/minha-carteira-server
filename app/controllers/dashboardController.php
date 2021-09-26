@@ -9,6 +9,7 @@ class dashboardController extends controllerHelper{
 
         if(!empty($request['access_token']) && $Sessao->validarToken($request['access_token'])){
             $sessao = $Sessao->buscarValidoPorToken($request['access_token']);
+
             $Transacoes = new Transacoes();
 
             $mesano = date('m-Y');
@@ -172,7 +173,7 @@ class dashboardController extends controllerHelper{
         if(empty($access_token) && !$Sessao->validarToken($access_token)){
             return http_response_code(401);
         }
-        
+
         $mesano = $this->validarMesAno($_POST['mesano']) == false ? date('m-Y') : $_POST['mesano'];
 
         $sessao = $Sessao->buscarValidoPorToken($access_token);
