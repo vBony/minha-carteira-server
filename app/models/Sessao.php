@@ -92,7 +92,6 @@ class Sessao extends modelHelper{
 
     public function validarToken($token){
         $token = $this->buscarValidoPorToken($token);
-        return $token;
 
         if($token != null){
             return true;
